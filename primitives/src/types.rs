@@ -25,6 +25,7 @@ pub struct ExecutionStateProof {
 }
 
 sol! {
+    #[derive(Debug, Serialize, Deserialize)]
     struct ProofOutputs {
         /// The previous beacon block header hash.
         bytes32 prevHeader;

@@ -1,10 +1,11 @@
+use alloy::dyn_abi::SolType;
 use anyhow::Result;
 use helios_consensus_core::consensus_spec::MainnetConsensusSpec;
 use helios_ethereum::consensus::Inner;
 use helios_ethereum::rpc::http_rpc::HttpRpc;
 use helios_ethereum::rpc::ConsensusRpc;
 use log::info;
-use sp1_helios_primitives::types::ProofInputs;
+use sp1_helios_primitives::types::{ProofInputs, ProofOutputs};
 use sp1_helios_script::*;
 use sp1_sdk::{EnvProver, ProverClient, SP1ProofWithPublicValues, SP1ProvingKey, SP1Stdin};
 use std::time::Instant;
@@ -32,18 +33,18 @@ impl SP1HeliosOperator {
         client: Inner<MainnetConsensusSpec, HttpRpc>,
     ) -> Result<Option<SP1ProofWithPublicValues>> {
         // the head we are trying to prove
-        let head: u64 = 11558912;
+        //let head: u64 = 11558909;
         let mut stdin = SP1Stdin::new();
-        // Setup client.
         let updates = get_updates(&client).await;
         println!("About to prove {:?} light client updates!", updates.len());
         let finality_update = client.rpc.get_finality_update().await.unwrap();
         // Check if contract is up to date
         let latest_block = finality_update.finalized_header().beacon().slot;
-        if latest_block <= head {
+        println!("Latest block: {:?}", latest_block);
+        /*if latest_block <= head {
             info!("Contract is up to date. Nothing to update.");
             return Ok(None);
-        }
+        }*/
         // Create program inputs
         let expected_current_slot = client.expected_current_slot();
         let inputs = ProofInputs {
@@ -59,6 +60,8 @@ impl SP1HeliosOperator {
         // Generate proof.
         let proof = self.client.prove(&self.pk, &stdin).groth16().run()?;
         info!("Attempting to update to new head block: {:?}", latest_block);
+        let outputs = ProofOutputs::abi_decode(proof.public_values.as_slice(), false).unwrap();
+        println!("Proof outputs: {:?}", outputs);
         Ok(Some(proof))
     }
 
@@ -66,7 +69,7 @@ impl SP1HeliosOperator {
     async fn run(&mut self) {
         info!("Starting SP1 Helios operator");
         // slot multiple of 8192
-        let slot: u64 = 11558912 - 8192;
+        let slot: u64 = 11558912; //- 8192;
         let checkpoint = get_checkpoint(slot).await.unwrap();
         // Get the client from the checkpoint
         let client = get_client(checkpoint).await.unwrap();

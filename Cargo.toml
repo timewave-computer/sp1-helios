@@ -2,8 +2,8 @@
 members = ["primitives", "script", "program"]
 resolver = "2"
 
-[profile.dev]
-opt-level = 3
+#[profile.dev]
+#opt-level = 3
 
 [workspace.package]
 license = "MIT"
@@ -26,8 +26,10 @@ helios-ethereum = { git = "https://github.com/a16z/helios", tag = "0.8.6" }
 # general
 dotenv = "0.15.0"
 eyre = "0.6.12"
-sp1-sdk = "4.1.7"
-sp1-build = "4.1.7"
+sp1-sdk = { git = "https://github.com/timewave-computer/sp1", branch = "jonas/fix-4.1.7-syscall", features = [
+    "native-gnark",
+] }
+sp1-build = { git = "https://github.com/timewave-computer/sp1", branch = "jonas/fix-4.1.7-syscall" }
 tokio = "1.38.0"
 tracing = "0.1.37"
 serde = "1.0.203"

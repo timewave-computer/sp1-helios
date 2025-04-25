@@ -7,7 +7,7 @@ use log::info;
 use sp1_helios_primitives::types::ProofInputs;
 use sp1_helios_script::*;
 use sp1_sdk::{EnvProver, ProverClient, SP1ProofWithPublicValues, SP1ProvingKey, SP1Stdin};
-use std::env;
+use std::time::Instant;
 
 const ELF: &[u8] = include_bytes!("../../elf/sp1-helios-elf");
 
@@ -32,15 +32,12 @@ impl SP1HeliosOperator {
         client: Inner<MainnetConsensusSpec, HttpRpc>,
     ) -> Result<Option<SP1ProofWithPublicValues>> {
         // the head we are trying to prove
-        let head: u64 = 11558913;
-
+        let head: u64 = 11558912;
         let mut stdin = SP1Stdin::new();
-
         // Setup client.
         let updates = get_updates(&client).await;
         println!("About to prove {:?} light client updates!", updates.len());
         let finality_update = client.rpc.get_finality_update().await.unwrap();
-
         // Check if contract is up to date
         let latest_block = finality_update.finalized_header().beacon().slot;
         if latest_block <= head {
@@ -59,10 +56,8 @@ impl SP1HeliosOperator {
         };
         let encoded_proof_inputs = serde_cbor::to_vec(&inputs)?;
         stdin.write_slice(&encoded_proof_inputs);
-
         // Generate proof.
         let proof = self.client.prove(&self.pk, &stdin).groth16().run()?;
-
         info!("Attempting to update to new head block: {:?}", latest_block);
         Ok(Some(proof))
     }
@@ -71,7 +66,7 @@ impl SP1HeliosOperator {
     async fn run(&mut self) {
         info!("Starting SP1 Helios operator");
         // slot multiple of 8192
-        let slot: u64 = 11558912;
+        let slot: u64 = 11558912 - 8192;
         let checkpoint = get_checkpoint(slot).await.unwrap();
         // Get the client from the checkpoint
         let client = get_client(checkpoint).await.unwrap();
@@ -83,10 +78,11 @@ impl SP1HeliosOperator {
 
 #[tokio::main]
 async fn main() {
-    env::set_var("RUST_LOG", "info");
+    let start_time = Instant::now();
     dotenv::dotenv().ok();
-    env_logger::init();
 
     let mut operator = SP1HeliosOperator::new().await;
     operator.run().await;
+    let end_time = Instant::now();
+    println!("Time taken: {:?}", end_time.duration_since(start_time));
 }

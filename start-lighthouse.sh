@@ -1,12 +1,7 @@
-docker run \
-  -p 127.0.0.1:5052:5052 \
-  -v $HOME/.lighthouse:/root/.lighthouse \
-  sigp/lighthouse \
-  lighthouse \
-    beacon \
-    --network sepolia \
-    --checkpoint-sync-url https://sepolia.checkpoint.sigp.io \
-    --http \
-    --http-address 0.0.0.0 \
-    --disable-deposit-contract-sync
+lighthouse bn \
+  --network sepolia \
+  --execution-endpoint http://localhost:8551 \
+  --execution-jwt $HOME/.jwt \
+  --checkpoint-sync-url https://beaconstate-sepolia.chainsafe.io \
+  --http
 

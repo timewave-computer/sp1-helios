@@ -2,6 +2,9 @@
 members = ["primitives", "script", "program"]
 resolver = "2"
 
+[profile.dev]
+opt-level = 3
+
 [workspace.package]
 license = "MIT"
 edition = "2021"

@@ -39,7 +39,7 @@ pub fn main() {
 
     // 1. Verify and apply all generic updates
     for (index, update) in updates.iter().enumerate() {
-        println!("Verifying update {} of {}.", index + 1, updates.len());
+        //println!("Verifying update {} of {}.", index + 1, updates.len());
         verify_update(update, expected_current_slot, &store, genesis_root, &forks)
             .expect("Update is invalid!");
         apply_update(&mut store, update);

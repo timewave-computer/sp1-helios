@@ -10,7 +10,7 @@ use sp1_helios_script::*;
 use sp1_sdk::{EnvProver, ProverClient, SP1ProofWithPublicValues, SP1ProvingKey, SP1Stdin};
 use std::time::Instant;
 
-const ELF: &[u8] = include_bytes!("../../elf/sp1-helios-elf");
+const ELF: &[u8] = include_bytes!("../../elf/program.elf");
 
 struct SP1HeliosOperator {
     client: EnvProver,

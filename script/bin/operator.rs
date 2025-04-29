@@ -36,15 +36,9 @@ impl SP1HeliosOperator {
         //let head: u64 = 11558909;
         let mut stdin = SP1Stdin::new();
         let updates = get_updates(&client).await;
-        println!("About to prove {:?} light client updates!", updates.len());
         let finality_update = client.rpc.get_finality_update().await.unwrap();
         // Check if contract is up to date
         let latest_block = finality_update.finalized_header().beacon().slot;
-        println!("Latest block: {:?}", latest_block);
-        /*if latest_block <= head {
-            info!("Contract is up to date. Nothing to update.");
-            return Ok(None);
-        }*/
         // Create program inputs
         let expected_current_slot = client.expected_current_slot();
         let inputs = ProofInputs {

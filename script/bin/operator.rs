@@ -31,11 +31,12 @@ impl SP1HeliosOperator {
     async fn request_update(
         &self,
         client: Inner<MainnetConsensusSpec, HttpRpc>,
+        update_count: u8,
     ) -> Result<Option<SP1ProofWithPublicValues>> {
         // the head we are trying to prove
         //let head: u64 = 11558909;
         let mut stdin = SP1Stdin::new();
-        let updates = get_updates(&client).await;
+        let updates = get_updates(&client, update_count).await;
         let finality_update = client.rpc.get_finality_update().await.unwrap();
         // Check if contract is up to date
         let latest_block = finality_update.finalized_header().beacon().slot;
@@ -64,12 +65,14 @@ impl SP1HeliosOperator {
         info!("Starting SP1 Helios operator");
         // slot multiple of 8192
         let slot: u64 = 11558912; //- 8192;
+                                  // the amount of updates since the last checkpoint
+        let update_count: u8 = 0;
         let checkpoint = get_checkpoint(slot).await.unwrap();
         // Get the client from the checkpoint
         let client = get_client(checkpoint).await.unwrap();
 
         // Request an update
-        self.request_update(client).await.unwrap();
+        self.request_update(client, update_count).await.unwrap();
     }
 }
 

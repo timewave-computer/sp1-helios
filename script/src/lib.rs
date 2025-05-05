@@ -16,20 +16,17 @@ use std::sync::Arc;
 use tokio::sync::{mpsc::channel, watch};
 use tree_hash::TreeHash;
 
-pub const MAX_REQUEST_LIGHT_CLIENT_UPDATES: u8 = 32;
+//pub const MAX_REQUEST_LIGHT_CLIENT_UPDATES: u8 = 32;
 
 /// Fetch updates for client
 pub async fn get_updates(
     client: &Inner<MainnetConsensusSpec, HttpRpc>,
+    update_count: u8,
 ) -> Vec<Update<MainnetConsensusSpec>> {
     let period =
         calc_sync_period::<MainnetConsensusSpec>(client.store.finalized_header.beacon().slot);
 
-    let updates = client
-        .rpc
-        .get_updates(period, MAX_REQUEST_LIGHT_CLIENT_UPDATES)
-        .await
-        .unwrap();
+    let updates = client.rpc.get_updates(period, update_count).await.unwrap();
 
     updates.clone()
 }

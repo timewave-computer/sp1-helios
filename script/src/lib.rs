@@ -16,7 +16,7 @@ use std::sync::Arc;
 use tokio::sync::{mpsc::channel, watch};
 use tree_hash::TreeHash;
 
-pub const MAX_REQUEST_LIGHT_CLIENT_UPDATES: u8 = 2;
+pub const MAX_REQUEST_LIGHT_CLIENT_UPDATES: u8 = 32;
 
 /// Fetch updates for client
 pub async fn get_updates(
